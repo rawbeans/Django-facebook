@@ -162,7 +162,9 @@ def _register_user(request, facebook, profile_callback=None):
     form = form_class(data=data, files=request.FILES,
         initial={'ip': request.META['REMOTE_ADDR']})
 
-    if not form.is_valid():
+    #form is not complete until user confirms values
+    confirmed = bool(int(request.REQUEST.get('confirmed', 0)))
+    if not form.is_valid() or not confirmed:
         error = facebook_exceptions.IncompleteProfileError('Facebook data %s '
             'gave error %s' % (facebook_data, form.errors))
         error.form = form
